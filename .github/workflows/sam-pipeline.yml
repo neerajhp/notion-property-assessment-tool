@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS-REGION: ap-southeast-2
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::391134092916:role/github-actions-deploy
+          aws-region: ${{env.AWS-REGION}}
+      - name: Setup Sam
+        uses: aws-actions/setup-sam@v2
+      - name: Build
+        run: sam build -t infra/template.yaml --use-container
+      - name: Deploy
+        run:
+          sam deploy -t infra/template.yaml --no-confirm-changeset
+          --no-fail-on-empty-changeset --region ${{env.AWS-REGION}}
