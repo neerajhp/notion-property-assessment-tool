@@ -23,9 +23,11 @@ jobs:
           aws-region: ${{env.AWS-REGION}}
       - name: Setup Sam
         uses: aws-actions/setup-sam@v2
+      - name: Install Esbuild
+        run: yarn add esbuild
       - name: Build
-        run: sam build -t infra/template.yaml --use-container
+        run: sam build --template-file infra/template.yaml
       - name: Deploy
         run:
-          sam deploy -t infra/template.yaml --no-confirm-changeset
-          --no-fail-on-empty-changeset --region ${{env.AWS-REGION}}
+          sam deploy --config-file infra/samconfig.toml --no-confirm-changeset
+          --no-fail-on-empty-changeset --region ${{env.AWS-REGION}} --debug

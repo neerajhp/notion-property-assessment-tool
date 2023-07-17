@@ -5,16 +5,17 @@ Transform:
 - AWS::Serverless-2016-10-31
 
 Resources:
-  ScheduledEventLogger:
+  NotionAdapter:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: property-assessment-helper-notion-adapter
       Description: A Lambda function that logs the payload of messages sent to an
         associated SQS queue.
       Runtime: nodejs18.x
       Architectures:
       - x86_64
-      Handler: src/handlers/scheduled-event-logger.scheduledEventLoggerHandler
-
+      CodeUri: ../notion-adapter/
+      Handler: src/app.handler
       Events:
         CloudWatchEvent:
           Type: Schedule
@@ -22,6 +23,14 @@ Resources:
             Schedule: cron(0 * * * ? *)
       MemorySize: 128
       Timeout: 100
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+        - src/app.ts
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -34,7 +43,6 @@ Resources:
     Properties:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
 Globals:
   Function:
     Tracing: Active
