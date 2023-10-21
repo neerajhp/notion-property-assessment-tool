@@ -14,9 +14,9 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 🛎️ Checkout
         uses: actions/checkout@v3
-      - name: Configure AWS credentials from Test account
+      - name: 🫢 Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::391134092916:role/github-actions-deploy
@@ -25,9 +25,16 @@ jobs:
         uses: aws-actions/setup-sam@v2
       - name: Install Esbuild
         run: yarn add esbuild
-      - name: Build
+      - name: 📁 Install dependencies
+        working-directory: ./notion-adapter
+        run: yarn install
+      - name: 🧪 Run Tests
+        working-directory: ./notion-adapter
+        run: yarn run test
+      - name: 🏗️ Build
         run: sam build --template-file infra/template.yaml
-      - name: Deploy
+
+      - name: 🚀 Deploy
         run:
           sam deploy --config-file infra/samconfig.toml --no-confirm-changeset
           --no-fail-on-empty-changeset --region ${{env.AWS-REGION}} --debug
