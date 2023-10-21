@@ -27,7 +27,7 @@ jobs:
         run: yarn add esbuild
       - name: 📁 Install dependencies
         working-directory: ./notion-adapter
-        run: yarn install
+        run: yarn
       - name: 🧪 Run Tests
         working-directory: ./notion-adapter
         run: yarn run test
